@@ -3,16 +3,17 @@
 #include <time.h>
 #include <string.h>
 
-
-void captureDatosActuales(struct zonaUrbana *zona) {
+void captureDatosActuales(struct zonaUrbana *zona)
+{
     printf("----Captura de datos actuales----\n");
     getchar();
 
-    for (int i = 0; i < num_zonasUrbanas; i++) {
+    for (int i = 0; i < num_zonasUrbanas; i++)
+    {
         printf("Ingrese el nombre de la zona urbana: ");
         fgets(zona[i].nombre, sizeof(zona[i].nombre), stdin);
-        zona[i].nombre[strcspn(zona[i].nombre, "\n")] = '\0'; 
-        
+        zona[i].nombre[strcspn(zona[i].nombre, "\n")] = '\0';
+
         printf("Ingrese el CO2: ");
         scanf("%f", &zona[i].CO);
         printf("Ingrese el SO2: ");
@@ -34,6 +35,13 @@ void captureDatosActuales(struct zonaUrbana *zona) {
 void generateDatosHistoricos(struct zonaUrbana *zona)
 {
     printf("----Generacion de datos historicos----\n");
+    printf("----Generacion de datos historicos----\n");
+    FILE *file = fopen("datos_historicos.txt", "w");
+    if (file == NULL) {
+        printf("Error al abrir el archivo de datos históricos.\n");
+        return;
+    }
+    
     for (int i = 0; i < num_zonasUrbanas; i++)
     {
         zona[i].CO = 4 + rand() % 200;
@@ -47,78 +55,100 @@ void generateDatosHistoricos(struct zonaUrbana *zona)
         printf("  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
         printf("  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
                zona[i].temperatura, zona[i].viento, zona[i].humedad);
+        fprintf(file, "%s:\n", zona[i].nombre);
+
+        fprintf(file, "  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
+        fprintf(file, "  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
+                zona[i].temperatura, zona[i].viento, zona[i].humedad);
     }
+    fclose(file);
 }
 
-void monitoreoContaminacionActual(struct zonaUrbana *zona) {
-    const float limiteCO = 4.0;   // En ppm
-    const float limiteSO2 = 40.0; // En µg/m³
-    const float limiteNO2 = 25.0; // En µg/m³
+void monitoreoContaminacionActual(struct zonaUrbana *zona)
+{
+    const float limiteCO = 4.0;    // En ppm
+    const float limiteSO2 = 40.0;  // En µg/m³
+    const float limiteNO2 = 25.0;  // En µg/m³
     const float limitePM25 = 15.0; // En µg/m³
 
     printf("---- Monitoreo de contaminacion actual ----\n");
-    for (int i = 0; i < num_zonasUrbanas; i++) {
+    for (int i = 0; i < num_zonasUrbanas; i++)
+    {
         printf("%s:\n", zona[i].nombre);
 
-        
         printf("  CO: %.2f gm/m³ ", zona[i].CO);
-        if (zona[i].CO > limiteCO) {
+        if (zona[i].CO > limiteCO)
+        {
             printf("(Excede el limite de %.2f gm/m³)\n", limiteCO);
             printf("  Alerta: Reduzca el trafico vehicular y cierre temporalmente las industrias.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
-        
         printf("  SO2: %.2f µg/m³ ", zona[i].SO2);
-        if (zona[i].SO2 > limiteSO2) {
+        if (zona[i].SO2 > limiteSO2)
+        {
             printf("(Excede el limite de %.2f µg/m³)\n", limiteSO2);
             printf("  Alerta: Reduzca el trafico vehicular y cierre temporalmente las industrias.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
-        
         printf("  NO2: %.2f µg/m³ ", zona[i].NO2);
-        if (zona[i].NO2 > limiteNO2) {
+        if (zona[i].NO2 > limiteNO2)
+        {
             printf("(Excede el limite de %.2f µg/m³)\n", limiteNO2);
             printf("  Alerta: Reduzca el trafico vehicular y cierre temporalmente las industrias.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
-        
         printf("  PM2.5: %.1f µg/m³ ", zona[i].PM25);
-        if (zona[i].PM25 > limitePM25) {
+        if (zona[i].PM25 > limitePM25)
+        {
             printf("(Excede el limite de %.1f µg/m³)\n", limitePM25);
             printf("  Alerta: Suspenda actividades al aire libre.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del límite)\n");
         }
     }
 }
 
-void predictNivelesFuturos(struct zonaUrbana *zona) {
-    const float limiteCO = 4.0;   // En mg/m³
-    const float limiteSO2 = 40.0; // En µg/m³
-    const float limiteNO2 = 25.0; // En µg/m³
+void predictNivelesFuturos(struct zonaUrbana *zona)
+{
+    const float limiteCO = 4.0;    // En mg/m³
+    const float limiteSO2 = 40.0;  // En µg/m³
+    const float limiteNO2 = 25.0;  // En µg/m³
     const float limitePM25 = 15.0; // En µg/m³
 
     printf("---- Prediccion de niveles futuros ----\n");
     FILE *file = fopen("reporte_predicciones.txt", "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Error al abrir el archivo de reporte.\n");
         return;
     }
 
-    for (int i = 0; i < num_zonasUrbanas; i++) {
+    for (int i = 0; i < num_zonasUrbanas; i++)
+    {
         float factorTemperatura = zona[i].temperatura / 30.0;
         float factorViento = zona[i].viento / 10.0;
         float factorHumedad = zona[i].humedad / 50.0;
 
-        if (factorTemperatura < 0) factorTemperatura = 0;
-        if (factorViento < 0) factorViento = 0;
-        if (factorHumedad < 0) factorHumedad = 0;
+        if (factorTemperatura < 0)
+            factorTemperatura = 0;
+        if (factorViento < 0)
+            factorViento = 0;
+        if (factorHumedad < 0)
+            factorHumedad = 0;
 
         float predCO = zona[i].CO * (1.0 + factorTemperatura + factorHumedad) / (1.0 + factorViento);
         float predSO2 = zona[i].SO2 * (1.0 + factorTemperatura + factorHumedad) / (1.0 + factorViento);
@@ -128,34 +158,46 @@ void predictNivelesFuturos(struct zonaUrbana *zona) {
         printf("%s:\n", zona[i].nombre);
         printf("  Predicción para mañana:\n");
         printf("    CO: %.2f gm/m³ ", predCO);
-        if (predCO > limiteCO) {
+        if (predCO > limiteCO)
+        {
             printf("(Excede el limite de %.2f gm/m³)\n", limiteCO);
             printf("    Alerta: Reduzca el tráfico vehicular y cierre temporalmente las industrias.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
         printf("    SO2: %.2f µg/m³ ", predSO2);
-        if (predSO2 > limiteSO2) {
+        if (predSO2 > limiteSO2)
+        {
             printf("(Excede el limite de %.2f µg/m³)\n", limiteSO2);
             printf("    Alerta: Reduzca el tráfico vehicular y cierre temporalmente las industrias.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
         printf("    NO2: %.2f µg/m³ ", predNO2);
-        if (predNO2 > limiteNO2) {
+        if (predNO2 > limiteNO2)
+        {
             printf("(Excede el limite de %.2f µg/m³)\n", limiteNO2);
             printf("    Alerta: Reduzca el tráfico vehicular y cierre temporalmente las industrias.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
         printf("    PM2.5: %.2f µg/m³ ", predPM25);
-        if (predPM25 > limitePM25) {
+        if (predPM25 > limitePM25)
+        {
             printf("(Excede el limite de %.2f µg/m³)\n", limitePM25);
             printf("    Alerta: Suspenda actividades al aire libre.\n");
-        } else {
+        }
+        else
+        {
             printf("(Dentro del limite)\n");
         }
 
@@ -276,6 +318,5 @@ void calcularPromediosHistoricos(struct zonaUrbana *zona, int num_datos)
         printf("  Promedio Temperatura: %.2f°C\n", promTemperatura);
         printf("  Promedio Viento: %.2f m/s\n", promViento);
         printf("  Promedio Humedad: %.2f\n", promHumedad);
-        
     }
 }
