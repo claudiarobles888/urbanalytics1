@@ -60,7 +60,7 @@ void monitoreoContaminacionActual(struct zonaUrbana *zona) {
     for (int i = 0; i < num_zonasUrbanas; i++) {
         printf("%s:\n", zona[i].nombre);
 
-        // Comparar niveles de CO
+        
         printf("  CO: %.2f gm/m³ ", zona[i].CO);
         if (zona[i].CO > limiteCO) {
             printf("(Excede el limite de %.2f gm/m³)\n", limiteCO);
@@ -69,7 +69,7 @@ void monitoreoContaminacionActual(struct zonaUrbana *zona) {
             printf("(Dentro del limite)\n");
         }
 
-        // Comparar niveles de SO2
+        
         printf("  SO2: %.2f µg/m³ ", zona[i].SO2);
         if (zona[i].SO2 > limiteSO2) {
             printf("(Excede el limite de %.2f µg/m³)\n", limiteSO2);
@@ -78,7 +78,7 @@ void monitoreoContaminacionActual(struct zonaUrbana *zona) {
             printf("(Dentro del limite)\n");
         }
 
-        // Comparar niveles de NO2
+        
         printf("  NO2: %.2f µg/m³ ", zona[i].NO2);
         if (zona[i].NO2 > limiteNO2) {
             printf("(Excede el limite de %.2f µg/m³)\n", limiteNO2);
@@ -87,7 +87,7 @@ void monitoreoContaminacionActual(struct zonaUrbana *zona) {
             printf("(Dentro del limite)\n");
         }
 
-        // Comparar niveles de PM2.5
+        
         printf("  PM2.5: %.1f µg/m³ ", zona[i].PM25);
         if (zona[i].PM25 > limitePM25) {
             printf("(Excede el limite de %.1f µg/m³)\n", limitePM25);
