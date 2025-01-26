@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "funciones.h"
+#include <stdlib.h>
 #include <time.h>
+#include "funciones.h"
 #include <string.h>
 
 void captureDatosActuales(struct zonaUrbana *zona)
@@ -37,30 +38,32 @@ void generateDatosHistoricos(struct zonaUrbana *zona)
     printf("----Generacion de datos historicos----\n");
     FILE *file = fopen("datos_historicos.txt", "w");
     if (file == NULL) {
-        printf("Error al abrir el archivo de datos historicos.\n");
+        printf("Error al abrir el archivo de datos históricos.\n");
         return;
     }
-    
-    for (int i = 0; i < num_zonasUrbanas; i++)
-    {
-        zona[i].CO = 4 + rand() % 200;
-        zona[i].SO2 = 40 + rand() % 40;
-        zona[i].NO2 = 25 + rand() % 30;
-        zona[i].PM25 = 15 + rand() % 50;
-        zona[i].temperatura = 10 + rand() % 30;
-        zona[i].viento = 0 + rand() % 20;
-        zona[i].humedad = 30 + rand() % 70;
-        printf("%s:\n", zona[i].nombre);
-        printf("  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
-        printf("  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
-               zona[i].temperatura, zona[i].viento, zona[i].humedad);
-        
-        fprintf(file, "%s:\n", zona[i].nombre);
-        fprintf(file, "  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
-        fprintf(file, "  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
-                zona[i].temperatura, zona[i].viento, zona[i].humedad);
+
+    srand(time(NULL));
+
+    for (int dia = 1; dia <= 30; dia++) {
+        fprintf(file, "Dia %d:\n", dia);
+        for (int i = 0; i < num_zonasUrbanas; i++) {
+            zona[i].CO = 4 + rand() % 200;
+            zona[i].SO2 = 40 + rand() % 40;
+            zona[i].NO2 = 25 + rand() % 30;
+            zona[i].PM25 = 15 + rand() % 50;
+            zona[i].temperatura = 10 + rand() % 30;
+            zona[i].viento = 0 + rand() % 20;
+            zona[i].humedad = 30 + rand() % 70;
+
+            fprintf(file, "  Zona %d (%s):\n", zona[i].id, zona[i].nombre);
+            fprintf(file, "    CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
+            fprintf(file, "    Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
+                    zona[i].temperatura, zona[i].viento, zona[i].humedad);
+        }
     }
+
     fclose(file);
+    printf("Datos historicos generados y guardados en datoshistoricos.txt\n");
 }
 
 void monitoreoContaminacionActual(struct zonaUrbana *zona)
@@ -129,86 +132,83 @@ void predictNivelesFuturos(struct zonaUrbana *zona)
     const float limitePM25 = 15.0; // En µg/m³
 
     printf("---- Prediccion de niveles futuros ----\n");
-    FILE *file = fopen("reporte_predicciones.txt", "w");
-    if (file == NULL)
-    {
-        printf("Error al abrir el archivo de reporte.\n");
+
+    FILE *file = fopen("datos_historicos.txt", "r");
+    if (file == NULL) {
+        printf("Error al abrir el archivo de datos históricos.\n");
         return;
     }
 
-    for (int i = 0; i < num_zonasUrbanas; i++)
-    {
-        float factorTemperatura = zona[i].temperatura / 30.0;
-        float factorViento = zona[i].viento / 10.0;
-        float factorHumedad = zona[i].humedad / 50.0;
+    float sum_CO[num_zonasUrbanas] = {0};
+    float sum_SO2[num_zonasUrbanas] = {0};
+    float sum_NO2[num_zonasUrbanas] = {0};
+    float sum_PM25[num_zonasUrbanas] = {0};
+    float sum_temperatura[num_zonasUrbanas] = {0};
+    float sum_viento[num_zonasUrbanas] = {0};
+    float sum_humedad[num_zonasUrbanas] = {0};
 
-        if (factorTemperatura < 0)
-            factorTemperatura = 0;
-        if (factorViento < 0)
-            factorViento = 0;
-        if (factorHumedad < 0)
-            factorHumedad = 0;
-
-        float predCO = zona[i].CO * (1.0 + factorTemperatura + factorHumedad) / (1.0 + factorViento);
-        float predSO2 = zona[i].SO2 * (1.0 + factorTemperatura + factorHumedad) / (1.0 + factorViento);
-        float predNO2 = zona[i].NO2 * (1.0 + factorTemperatura + factorHumedad) / (1.0 + factorViento);
-        float predPM25 = zona[i].PM25 * (1.0 + factorTemperatura + factorHumedad) / (1.0 + factorViento);
-
-        printf("%s:\n", zona[i].nombre);
-        printf("  Predicción para mañana:\n");
-        printf("    CO: %.2f gm/m³ ", predCO);
-        if (predCO > limiteCO)
-        {
-            printf("(Excede el limite de %.2f gm/m³)\n", limiteCO);
-            printf("    Alerta: Reduzca el tráfico vehicular y cierre temporalmente las industrias.\n");
-        }
-        else
-        {
-            printf("(Dentro del limite)\n");
+    char line[256];
+    int dia = 0;
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "Dia", 3) == 0) {
+            dia++;
+            continue;
         }
 
-        printf("    SO2: %.2f µg/m³ ", predSO2);
-        if (predSO2 > limiteSO2)
-        {
-            printf("(Excede el limite de %.2f µg/m³)\n", limiteSO2);
-            printf("    Alerta: Reduzca el tráfico vehicular y cierre temporalmente las industrias.\n");
-        }
-        else
-        {
-            printf("(Dentro del limite)\n");
-        }
+        int zona_id;
+        char nombre[50];
+        float CO, SO2, NO2, PM25, temperatura, viento, humedad;
 
-        printf("    NO2: %.2f µg/m³ ", predNO2);
-        if (predNO2 > limiteNO2)
-        {
-            printf("(Excede el limite de %.2f µg/m³)\n", limiteNO2);
-            printf("    Alerta: Reduzca el tráfico vehicular y cierre temporalmente las industrias.\n");
-        }
-        else
-        {
-            printf("(Dentro del limite)\n");
-        }
+        sscanf(line, " Zona %d (%[^)]):", &zona_id, nombre);
+        fgets(line, sizeof(line), file);
+        sscanf(line, " CO: %f, SO2: %f, NO2: %f, PM2.5: %f", &CO, &SO2, &NO2, &PM25);
+        fgets(line, sizeof(line), file);
+        sscanf(line, " Temperatura: %f°C, Viento: %f m/s, Humedad: %f%%", &temperatura, &viento, &humedad);
 
-        printf("    PM2.5: %.2f µg/m³ ", predPM25);
-        if (predPM25 > limitePM25)
-        {
-            printf("(Excede el limite de %.2f µg/m³)\n", limitePM25);
-            printf("    Alerta: Suspenda actividades al aire libre.\n");
-        }
-        else
-        {
-            printf("(Dentro del limite)\n");
-        }
-
-        fprintf(file, "%s:\n", zona[i].nombre);
-        fprintf(file, "  Prediccion para maniana:\n");
-        fprintf(file, "    CO: %.2f gm/m³\n", predCO);
-        fprintf(file, "    SO2: %.2f µg/m³\n", predSO2);
-        fprintf(file, "    NO2: %.2f µg/m³\n", predNO2);
-        fprintf(file, "    PM2.5: %.2f µg/m³\n", predPM25);
+        sum_CO[zona_id] += CO;
+        sum_SO2[zona_id] += SO2;
+        sum_NO2[zona_id] += NO2;
+        sum_PM25[zona_id] += PM25;
+        sum_temperatura[zona_id] += temperatura;
+        sum_viento[zona_id] += viento;
+        sum_humedad[zona_id] += humedad;
     }
 
     fclose(file);
+
+    FILE *pred_file = fopen("predicciones.txt", "w");
+    if (pred_file == NULL) {
+        printf("Error al abrir el archivo de predicciones.\n");
+        return;
+    }
+
+    for (int i = 0; i < num_zonasUrbanas; i++) {
+        float promedio_CO = sum_CO[i] / dia;
+        float promedio_SO2 = sum_SO2[i] / dia;
+        float promedio_NO2 = sum_NO2[i] / dia;
+        float promedio_PM25 = sum_PM25[i] / dia;
+        float promedio_temperatura = sum_temperatura[i] / dia;
+        float promedio_viento = sum_viento[i] / dia;
+        float promedio_humedad = sum_humedad[i] / dia;
+
+        float prediccion_CO = (promedio_CO + zona[i].CO) / 2;
+        float prediccion_SO2 = (promedio_SO2 + zona[i].SO2) / 2;
+        float prediccion_NO2 = (promedio_NO2 + zona[i].NO2) / 2;
+        float prediccion_PM25 = (promedio_PM25 + zona[i].PM25) / 2;
+
+        fprintf(pred_file, "Prediccion para la Zona %d (%s):\n", zona[i].id, zona[i].nombre);
+        fprintf(pred_file, "  CO: %.2f %s\n", prediccion_CO, (prediccion_CO > limiteCO) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(pred_file, "  SO2: %.2f %s\n", prediccion_SO2, (prediccion_SO2 > limiteSO2) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(pred_file, "  NO2: %.2f %s\n", prediccion_NO2, (prediccion_NO2 > limiteNO2) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(pred_file, "  PM2.5: %.2f %s\n", prediccion_PM25, (prediccion_PM25 > limitePM25) ? "(Excede el limite)" : "(Dentro del limite)");
+
+        if (prediccion_CO > limiteCO || prediccion_SO2 > limiteSO2 || prediccion_NO2 > limiteNO2 || prediccion_PM25 > limitePM25) {
+            fprintf(pred_file, "  Alerta: Se recomienda tomar medidas preventivas.\n");
+        }
+    }
+
+    fclose(pred_file);
+    printf("Predicciones calculadas y guardadas en predicciones.txt\n");
 }
 
 void guardarDatosActuales(struct zonaUrbana *zona)
@@ -237,85 +237,81 @@ void guardarDatosActuales(struct zonaUrbana *zona)
 
 void calcularPromediosHistoricos(struct zonaUrbana *zona, int num_datos)
 {
-    printf("---- Calculo de promedios historicos ----\n");
-    const float limiteCO = 4.0;    // En mg/m³
+    printf("----Calculo de promedios historicos----\n");
+
+    FILE *file = fopen("datos_historicos.txt", "r");
+    if (file == NULL) {
+        printf("Error al abrir el archivo de datos históricos.\n");
+        return;
+    }
+
+    float sum_CO[num_zonasUrbanas] = {0};
+    float sum_SO2[num_zonasUrbanas] = {0};
+    float sum_NO2[num_zonasUrbanas] = {0};
+    float sum_PM25[num_zonasUrbanas] = {0};
+    float sum_temperatura[num_zonasUrbanas] = {0};
+    float sum_viento[num_zonasUrbanas] = {0};
+    float sum_humedad[num_zonasUrbanas] = {0};
+
+    char line[256];
+    int dia = 0;
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "Dia", 3) == 0) {
+            dia++;
+            continue;
+        }
+
+        int zona_id;
+        char nombre[50];
+        float CO, SO2, NO2, PM25, temperatura, viento, humedad;
+
+        sscanf(line, " Zona %d (%[^)]):", &zona_id, nombre);
+        fgets(line, sizeof(line), file);
+        sscanf(line, " CO: %f, SO2: %f, NO2: %f, PM2.5: %f", &CO, &SO2, &NO2, &PM25);
+        fgets(line, sizeof(line), file);
+        sscanf(line, " Temperatura: %f°C, Viento: %f m/s, Humedad: %f%%", &temperatura, &viento, &humedad);
+
+        sum_CO[zona_id] += CO;
+        sum_SO2[zona_id] += SO2;
+        sum_NO2[zona_id] += NO2;
+        sum_PM25[zona_id] += PM25;
+        sum_temperatura[zona_id] += temperatura;
+        sum_viento[zona_id] += viento;
+        sum_humedad[zona_id] += humedad;
+    }
+
+    fclose(file);
+
+    FILE *prom_file = fopen("reporte_promedios_historicos.txt", "w");
+    if (prom_file == NULL) {
+        printf("Error al abrir el archivo de promedios historicos.\n");
+        return;
+    }
+
+    const float limiteCO = 4.0;    // En gm/m³
     const float limiteSO2 = 40.0;  // En µg/m³
     const float limiteNO2 = 25.0;  // En µg/m³
     const float limitePM25 = 15.0; // En µg/m³
 
-    printf("Promedios Historicos para los ultimos 30 dias ");
-    for (int i = 0; i < num_zonasUrbanas; i++)
-    {
-        float sumaCO = 0.0;
-        float sumaSO2 = 0.0;
-        float sumaNO2 = 0.0;
-        float sumaPM25 = 0.0;
-        float sumaTemperatura = 0.0;
-        float sumaViento = 0.0;
-        float sumaHumedad = 0.0;
+    for (int i = 0; i < num_zonasUrbanas; i++) {
+        float promedio_CO = sum_CO[i] / num_datos;
+        float promedio_SO2 = sum_SO2[i] / num_datos;
+        float promedio_NO2 = sum_NO2[i] / num_datos;
+        float promedio_PM25 = sum_PM25[i] / num_datos;
+        float promedio_temperatura = sum_temperatura[i] / num_datos;
+        float promedio_viento = sum_viento[i] / num_datos;
+        float promedio_humedad = sum_humedad[i] / num_datos;
 
-        for (int j = 0; j < num_datos; j++)
-        {
-            sumaCO += zona[i].CO;
-            sumaSO2 += zona[i].SO2;
-            sumaNO2 += zona[i].NO2;
-            sumaPM25 += zona[i].PM25;
-            sumaTemperatura += zona[i].temperatura;
-            sumaViento += zona[i].viento;
-            sumaHumedad += zona[i].humedad;
-        }
-
-        float promCO = sumaCO / num_datos;
-        float promSO2 = sumaSO2 / num_datos;
-        float promNO2 = sumaNO2 / num_datos;
-        float promPM25 = sumaPM25 / num_datos;
-        float promTemperatura = sumaTemperatura / num_datos;
-        float promViento = sumaViento / num_datos;
-        float promHumedad = sumaHumedad / num_datos;
-
-        printf("%s:\n", zona[i].nombre);
-        printf("  Promedio CO: %.2f mg/m³ ", promCO);
-        if (promCO > limiteCO)
-        {
-            printf("(Excede el limite de %.2f mg/m³)\n", limiteCO);
-        }
-        else
-        {
-            printf("(Dentro del limite)\n");
-        }
-
-        printf("  Promedio SO2: %.2f µg/m³ ", promSO2);
-        if (promSO2 > limiteSO2)
-        {
-            printf("(Excede el limite de %.2f µg/m³)\n", limiteSO2);
-        }
-        else
-        {
-            printf("(Dentro del limite)\n");
-        }
-
-        printf("  Promedio NO2: %.2f µg/m³ ", promNO2);
-        if (promNO2 > limiteNO2)
-        {
-            printf("(Excede el limite de %.2f µg/m³)\n", limiteNO2);
-        }
-        else
-        {
-            printf("(Dentro del límite)\n");
-        }
-
-        printf("  Promedio PM2.5: %.2f µg/m³ ", promPM25);
-        if (promPM25 > limitePM25)
-        {
-            printf("(Excede el limite de %.2f µg/m³)\n", limitePM25);
-        }
-        else
-        {
-            printf("(Dentro del límite)\n");
-        }
-
-        printf("  Promedio Temperatura: %.2f°C\n", promTemperatura);
-        printf("  Promedio Viento: %.2f m/s\n", promViento);
-        printf("  Promedio Humedad: %.2f\n", promHumedad);
+        fprintf(prom_file, "Promedios para la Zona %d (%s):\n", zona[i].id, zona[i].nombre);
+        fprintf(prom_file, "  CO: %.2f %s\n", promedio_CO, (promedio_CO > limiteCO) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  SO2: %.2f %s\n", promedio_SO2, (promedio_SO2 > limiteSO2) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  NO2: %.2f %s\n", promedio_NO2, (promedio_NO2 > limiteNO2) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  PM2.5: %.2f %s\n", promedio_PM25, (promedio_PM25 > limitePM25) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  Temperatura: %.2f°C\n", promedio_temperatura);
+        fprintf(prom_file, "  Viento: %.2f m/s\n", promedio_viento);
+        fprintf(prom_file, "  Humedad: %.1f%%\n", promedio_humedad);
     }
+
+    fclose(prom_file);
+    printf("Promedios historicos calculados y guardados en reporte_promedios_historicos.txt\n");
 }
