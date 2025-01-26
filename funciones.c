@@ -196,7 +196,7 @@ void predictNivelesFuturos(struct zonaUrbana *zona)
         float prediccion_NO2 = (promedio_NO2 + zona[i].NO2) / 2;
         float prediccion_PM25 = (promedio_PM25 + zona[i].PM25) / 2;
 
-        fprintf(pred_file, "Prediccion para la Zona %d (%s):\n", zona[i].id, zona[i].nombre);
+        fprintf(pred_file, "Prediccion para (%s):\n", zona[i].nombre);
         fprintf(pred_file, "  CO: %.2f %s\n", prediccion_CO, (prediccion_CO > limiteCO) ? "(Excede el limite)" : "(Dentro del limite)");
         fprintf(pred_file, "  SO2: %.2f %s\n", prediccion_SO2, (prediccion_SO2 > limiteSO2) ? "(Excede el limite)" : "(Dentro del limite)");
         fprintf(pred_file, "  NO2: %.2f %s\n", prediccion_NO2, (prediccion_NO2 > limiteNO2) ? "(Excede el limite)" : "(Dentro del limite)");
@@ -204,6 +204,16 @@ void predictNivelesFuturos(struct zonaUrbana *zona)
 
         if (prediccion_CO > limiteCO || prediccion_SO2 > limiteSO2 || prediccion_NO2 > limiteNO2 || prediccion_PM25 > limitePM25) {
             fprintf(pred_file, "  Alerta: Se recomienda tomar medidas preventivas.\n");
+        }
+
+        printf("Prediccion para (%s):\n", zona[i].nombre);
+        printf("  CO: %.2f %s\n", prediccion_CO, (prediccion_CO > limiteCO) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  SO2: %.2f %s\n", prediccion_SO2, (prediccion_SO2 > limiteSO2) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  NO2: %.2f %s\n", prediccion_NO2, (prediccion_NO2 > limiteNO2) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  PM2.5: %.2f %s\n", prediccion_PM25, (prediccion_PM25 > limitePM25) ? "(Excede el limite)" : "(Dentro del limite)");
+
+        if (prediccion_CO > limiteCO || prediccion_SO2 > limiteSO2 || prediccion_NO2 > limiteNO2 || prediccion_PM25 > limitePM25) {
+            printf("  Alerta: Se recomienda tomar medidas preventivas.\n");
         }
     }
 
@@ -282,36 +292,40 @@ void calcularPromediosHistoricos(struct zonaUrbana *zona, int num_datos)
 
     fclose(file);
 
-    FILE *prom_file = fopen("reporte_promedios_historicos.txt", "w");
+    FILE *prom_file = fopen("promedios_historicos.txt", "w");
     if (prom_file == NULL) {
-        printf("Error al abrir el archivo de promedios historicos.\n");
+        printf("Error al abrir el archivo de promedios históricos.\n");
         return;
     }
 
-    const float limiteCO = 4.0;    // En gm/m³
-    const float limiteSO2 = 40.0;  // En µg/m³
-    const float limiteNO2 = 25.0;  // En µg/m³
-    const float limitePM25 = 15.0; // En µg/m³
-
     for (int i = 0; i < num_zonasUrbanas; i++) {
-        float promedio_CO = sum_CO[i] / num_datos;
-        float promedio_SO2 = sum_SO2[i] / num_datos;
-        float promedio_NO2 = sum_NO2[i] / num_datos;
-        float promedio_PM25 = sum_PM25[i] / num_datos;
-        float promedio_temperatura = sum_temperatura[i] / num_datos;
-        float promedio_viento = sum_viento[i] / num_datos;
-        float promedio_humedad = sum_humedad[i] / num_datos;
+        float promedio_CO = sum_CO[i] / dia;
+        float promedio_SO2 = sum_SO2[i] / dia;
+        float promedio_NO2 = sum_NO2[i] / dia;
+        float promedio_PM25 = sum_PM25[i] / dia;
+        float promedio_temperatura = sum_temperatura[i] / dia;
+        float promedio_viento = sum_viento[i] / dia;
+        float promedio_humedad = sum_humedad[i] / dia;
 
-        fprintf(prom_file, "Promedios para la Zona %d (%s):\n", zona[i].id, zona[i].nombre);
-        fprintf(prom_file, "  CO: %.2f %s\n", promedio_CO, (promedio_CO > limiteCO) ? "(Excede el limite)" : "(Dentro del limite)");
-        fprintf(prom_file, "  SO2: %.2f %s\n", promedio_SO2, (promedio_SO2 > limiteSO2) ? "(Excede el limite)" : "(Dentro del limite)");
-        fprintf(prom_file, "  NO2: %.2f %s\n", promedio_NO2, (promedio_NO2 > limiteNO2) ? "(Excede el limite)" : "(Dentro del limite)");
-        fprintf(prom_file, "  PM2.5: %.2f %s\n", promedio_PM25, (promedio_PM25 > limitePM25) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "Promedios historicos para (%s):\n", zona[i].nombre);
+        fprintf(prom_file, "  CO: %.2f %s\n", promedio_CO, (promedio_CO > 4.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  SO2: %.2f %s\n", promedio_SO2, (promedio_SO2 > 40.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  NO2: %.2f %s\n", promedio_NO2, (promedio_NO2 > 25.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        fprintf(prom_file, "  PM2.5: %.2f %s\n", promedio_PM25, (promedio_PM25 > 15.0) ? "(Excede el limite)" : "(Dentro del limite)");
         fprintf(prom_file, "  Temperatura: %.2f°C\n", promedio_temperatura);
         fprintf(prom_file, "  Viento: %.2f m/s\n", promedio_viento);
         fprintf(prom_file, "  Humedad: %.1f%%\n", promedio_humedad);
+        
+        printf("Promedios historicos para (%s):\n", zona[i].nombre);
+        printf("  CO: %.2f %s\n", promedio_CO, (promedio_CO > 4.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  SO2: %.2f %s\n", promedio_SO2, (promedio_SO2 > 40.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  NO2: %.2f %s\n", promedio_NO2, (promedio_NO2 > 25.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  PM2.5: %.2f %s\n", promedio_PM25, (promedio_PM25 > 15.0) ? "(Excede el limite)" : "(Dentro del limite)");
+        printf("  Temperatura: %.2f°C\n", promedio_temperatura);
+        printf("  Viento: %.2f m/s\n", promedio_viento);
+        printf("  Humedad: %.1f%%\n", promedio_humedad);
     }
 
     fclose(prom_file);
-    printf("Promedios historicos calculados y guardados en reporte_promedios_historicos.txt\n");
+    printf("Promedios historicos calculados y guardados en promedios_historicos.txt\n");
 }
