@@ -34,8 +34,7 @@ void captureDatosActuales(struct zonaUrbana *zona)
 
 void generateDatosHistoricos(struct zonaUrbana *zona)
 {
-    printf("----Generacion de datos historicos----\n");
-    printf("----Generacion de datos historicos----\n");
+    printf("-----Generacion de datos historicos-----\n");
     FILE *file = fopen("datos_historicos.txt", "w");
     if (file == NULL) {
         printf("Error al abrir el archivo de datos históricos.\n");
