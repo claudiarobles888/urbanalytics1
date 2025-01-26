@@ -11,7 +11,7 @@ int main()
     {
         printf("-----Bienvenido a Urbanalytics-----\n");
         printf("Seleccione una opcion:\n");
-        printf("1. Ingreso de datos actuales\n2. Monitoreo de contaminacion actual\n3. Predecir niveles futuros\n4. Calculo de promedios historicos\n5. Salir\n");
+        printf("1. Ingreso de datos actuales\n2. Monitoreo de contaminacion actual\n3. Predecir niveles futuros\n4. Calculo de promedios historicos\n5. Mostrar datos historicos\n6. Salir\n");
         scanf("%d", &opc);
         getchar();
 
@@ -35,6 +35,9 @@ int main()
             break;
 
         case 5:
+            mostrarDatosHistoricos();
+            break;
+        case 6:
             printf("Saliendo del sistema\n");
             break;
 
@@ -42,7 +45,7 @@ int main()
         printf("Opcion no valida\n");
             break;
         }
-    } while (opc != 5);
+    } while (opc != 6);
 
     return 0;
 }

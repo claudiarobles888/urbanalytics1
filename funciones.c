@@ -63,6 +63,25 @@ void generateDatosHistoricos(struct zonaUrbana *zona)
     fclose(file);
 }
 
+void mostrarDatosHistoricos()
+{
+    printf("---- Mostrar datos historicos ----\n");
+    FILE *file = fopen("datos_historicos.txt", "r");
+    if (file == NULL)
+    {
+        printf("Error al abrir el archivo de datos históricos.\n");
+        return;
+    }
+
+    char line[100];
+    while (fgets(line, sizeof(line), file))
+    {
+        printf("%s", line);
+    }
+
+    fclose(file);
+}
+
 void monitoreoContaminacionActual(struct zonaUrbana *zona)
 {
     const float limiteCO = 4.0;    // En ppm

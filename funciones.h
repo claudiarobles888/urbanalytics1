@@ -14,3 +14,4 @@ void predictNivelesFuturos(struct zonaUrbana *zona);
 void monitoreoContaminacionActual(struct zonaUrbana *zona);
 void generateDatosHistoricos(struct zonaUrbana *zona);
 void guardarDatosActuales(struct zonaUrbana *zona);
+void mostrarDatosHistoricos();
