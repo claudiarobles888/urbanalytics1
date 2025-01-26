@@ -20,6 +20,7 @@ int main()
         case 1:
             captureDatosActuales(zona);
             guardarDatosActuales(zona);
+            generateDatosHistoricos(zona);
             break;
 
         case 2:

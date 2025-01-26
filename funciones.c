@@ -35,10 +35,9 @@ void captureDatosActuales(struct zonaUrbana *zona)
 void generateDatosHistoricos(struct zonaUrbana *zona)
 {
     printf("----Generacion de datos historicos----\n");
-    printf("----Generacion de datos historicos----\n");
     FILE *file = fopen("datos_historicos.txt", "w");
     if (file == NULL) {
-        printf("Error al abrir el archivo de datos históricos.\n");
+        printf("Error al abrir el archivo de datos historicos.\n");
         return;
     }
     
@@ -55,8 +54,8 @@ void generateDatosHistoricos(struct zonaUrbana *zona)
         printf("  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
         printf("  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
                zona[i].temperatura, zona[i].viento, zona[i].humedad);
+        
         fprintf(file, "%s:\n", zona[i].nombre);
-
         fprintf(file, "  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
         fprintf(file, "  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
                 zona[i].temperatura, zona[i].viento, zona[i].humedad);
@@ -66,7 +65,7 @@ void generateDatosHistoricos(struct zonaUrbana *zona)
 
 void monitoreoContaminacionActual(struct zonaUrbana *zona)
 {
-    const float limiteCO = 4.0;    // En ppm
+    const float limiteCO = 4.0;    // En gm/m³
     const float limiteSO2 = 40.0;  // En µg/m³
     const float limiteNO2 = 25.0;  // En µg/m³
     const float limitePM25 = 15.0; // En µg/m³
@@ -124,7 +123,7 @@ void monitoreoContaminacionActual(struct zonaUrbana *zona)
 
 void predictNivelesFuturos(struct zonaUrbana *zona)
 {
-    const float limiteCO = 4.0;    // En mg/m³
+    const float limiteCO = 4.0;    // En gm/m³
     const float limiteSO2 = 40.0;  // En µg/m³
     const float limiteNO2 = 25.0;  // En µg/m³
     const float limitePM25 = 15.0; // En µg/m³
