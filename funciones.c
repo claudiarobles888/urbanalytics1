@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "funciones.h"
 #include <time.h>
+#include <string.h>
 
 void captureDatosActuales(struct zonaUrbana *zona)
 {
@@ -33,15 +32,18 @@ void captureDatosActuales(struct zonaUrbana *zona)
     }
 }
 
-void generateDatosHistoricos(struct zonaUrbana *zona) {
+void generateDatosHistoricos(struct zonaUrbana *zona)
+{
+    printf("----Generacion de datos historicos----\n");
     printf("----Generacion de datos historicos----\n");
     FILE *file = fopen("datos_historicos.txt", "w");
     if (file == NULL) {
         printf("Error al abrir el archivo de datos históricos.\n");
         return;
     }
-
-    for (int i = 0; i < num_zonasUrbanas; i++) {
+    
+    for (int i = 0; i < num_zonasUrbanas; i++)
+    {
         zona[i].CO = 4 + rand() % 200;
         zona[i].SO2 = 40 + rand() % 40;
         zona[i].NO2 = 25 + rand() % 30;
@@ -49,37 +51,16 @@ void generateDatosHistoricos(struct zonaUrbana *zona) {
         zona[i].temperatura = 10 + rand() % 30;
         zona[i].viento = 0 + rand() % 20;
         zona[i].humedad = 30 + rand() % 70;
-
         printf("%s:\n", zona[i].nombre);
         printf("  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
         printf("  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
                zona[i].temperatura, zona[i].viento, zona[i].humedad);
-
         fprintf(file, "%s:\n", zona[i].nombre);
+
         fprintf(file, "  CO: %.2f, SO2: %.2f, NO2: %.2f, PM2.5: %.2f\n", zona[i].CO, zona[i].SO2, zona[i].NO2, zona[i].PM25);
         fprintf(file, "  Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %.1f%%\n",
                 zona[i].temperatura, zona[i].viento, zona[i].humedad);
     }
-
-    fclose(file);
-}
-
-void mostrarDatosHistoricos()
-{
-    FILE *file = fopen("datos_historicos.txt", "r");
-    if (file == NULL)
-    {
-        printf("Error al abrir el archivo de datos historicos.\n");
-        return;
-    }
-
-    char line[256];
-    printf("---- Mostrar datos historicos ----\n");
-    while (fgets(line, sizeof(line), file))
-    {
-        printf("%s", line);
-    }
-
     fclose(file);
 }
 

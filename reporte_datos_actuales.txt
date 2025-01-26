@@ -1,0 +1,40 @@
+norte:
+  CO: 20.00 mg/m³
+  SO2: 13.00 µg/m³
+  NO2: 10.00 µg/m³
+  PM2.5: 15.00 µg/m³
+  Temperatura: 20.00°C
+  Viento: 15.00 m/s
+  Humedad: 10.00
+sur:
+  CO: 20.00 mg/m³
+  SO2: 13.00 µg/m³
+  NO2: 39.00 µg/m³
+  PM2.5: 40.00 µg/m³
+  Temperatura: 19.00°C
+  Viento: 20.00 m/s
+  Humedad: 18.00
+este:
+  CO: 3.00 mg/m³
+  SO2: 10.00 µg/m³
+  NO2: 16.00 µg/m³
+  PM2.5: 20.00 µg/m³
+  Temperatura: 18.00°C
+  Viento: 24.00 m/s
+  Humedad: 12.00
+oeste:
+  CO: 1.00 mg/m³
+  SO2: 10.00 µg/m³
+  NO2: 5.00 µg/m³
+  PM2.5: 20.00 µg/m³
+  Temperatura: 16.00°C
+  Viento: 30.00 m/s
+  Humedad: 5.00
+san francisco:
+  CO: 15.00 mg/m³
+  SO2: 32.00 µg/m³
+  NO2: 24.00 µg/m³
+  PM2.5: 10.00 µg/m³
+  Temperatura: 15.00°C
+  Viento: 25.00 m/s
+  Humedad: 20.00
